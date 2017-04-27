@@ -5,11 +5,9 @@
 #include <cmath>
 #include <vector>
 #include <memory>
-using std::shared_ptr;
-using std::make_unique;
 
+// Base Class - Shape
 class Shape {
-
 public:
 	virtual ~Shape() = default;
 	virtual std::string generatePostScript() = 0;
@@ -20,12 +18,14 @@ public:
 	double y;
 };
 
+// Circle
 class Circle : public Shape {
 public:
 	Circle(double radius);
 	std::string generatePostScript() override;
 };
 
+// Polygon
 class Polygon : public Shape {
 public:
 	Polygon() = default;
@@ -37,6 +37,7 @@ private:
 	double numSides_g;
 };
 
+// Rectangle
 class Rectangle : public Shape {
 public:
 	Rectangle(double w, double h);
@@ -47,22 +48,26 @@ private:
 	double halfWidth_;
 };
 
+// Spacer
 class Spacer : public Shape {
 public:
 	Spacer(double w, double h);
 	std::string generatePostScript() override;
 };
 
+// Square
 class Square : public Polygon {
 public:
 	Square(double sideLength);
 };
 
+// Triangle
 class Triangle : public Polygon {
 public:
 	Triangle(double sideLength);
 };
 
+// Custom
 class Custom : public Shape
 {
 public:
@@ -70,27 +75,7 @@ public:
 	std::string generatePostScript();
 };
 
-// class ComplexShape : public Shape
-// {
-// public:
-// 	~ComplexShape() = default;
-// 	ComplexShape() = default;
-// 	ComplexShape(std::vector<shared_ptr<Shape>> shapeVec);
-// 	string generatePostScript() const override;
-// private:
-
-// };
-
-class Layered : public Shape
-{
-public:
-	Layered(std::vector<shared_ptr<Shape>> shapeListGiven);
-	std::string generatePostScript();
-
-private:
-	std::vector<shared_ptr<Shape>> shapeList;
-};
-
+// Scaled
 class Scaled : public Shape
 {
 public:
@@ -101,6 +86,7 @@ private:
 	std::string ScaleString;
 };
 
+// Rotated
 class Rotated : public Shape {
 public:
 	Rotated(Shape &shape, int rotationAngle);
@@ -111,21 +97,47 @@ private:
 	int rotAngle;
 };
 
-class Vertical : public Shape {
+// Base class CompoundShape which inherits from Shape 
+//		Used for Vertical, Horizontal, and Layered
+class CompoundShape : public Shape
+{
 public:
-	Vertical(std::vector<shared_ptr<Shape>> vertVec);
+	~CompoundShape() = default;
+	CompoundShape() = default;
+	CompoundShape(std::vector<std::shared_ptr<Shape>> shapeVec);
 	std::string generatePostScript() override;
-private:
-	std::vector<shared_ptr<Shape>> vertStack;
+
+protected:
+	virtual std::string forward_Translator(std::shared_ptr<Shape> shape) const;
+	virtual std::string reverse_Translator(std::shared_ptr<Shape> shape) const;
+	std::vector<std::shared_ptr<Shape>> shapeVec_;
 };
 
-class Horizontal : public Shape {
+// Layered
+class Layered : public CompoundShape
+{
 public:
-	Horizontal(std::vector<shared_ptr<Shape>> horizontalVec);
-	std::string generatePostScript() override;
+	Layered(std::vector<std::shared_ptr<Shape>> shapeVec);
+};
 
-private:
-	std::vector<shared_ptr<Shape>> horizontalStack;
+// Vertical
+class Vertical : public CompoundShape {
+public:
+	Vertical(std::vector<std::shared_ptr<Shape>> shapeVec);
+
+protected:
+	std::string forward_Translator(std::shared_ptr<Shape> shape) const override;
+	std::string reverse_Translator(std::shared_ptr<Shape> shape) const override;
+};
+
+// Horizontal
+class Horizontal : public CompoundShape {
+public:
+	Horizontal(std::vector<std::shared_ptr<Shape>> shapeVec);
+
+protected:
+	std::string forward_Translator(std::shared_ptr<Shape> shape) const override;
+	std::string reverse_Translator(std::shared_ptr<Shape> shape) const override;
 };
 
 #endif // SHAPE_HPP_INCLUDED

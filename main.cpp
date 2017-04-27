@@ -6,6 +6,8 @@
 #include <fstream>      // std::ofstream
 #include <vector>
 #include "shape.hpp"
+using std::shared_ptr;
+using std::make_unique;
 
 int main() {
 ////////////////////////////////CIRCLE TESTS
@@ -344,7 +346,7 @@ int main() {
 
 ////////////////////////////////CUSTOM SHAPE TESTS
 
-	// *** Class Test ***//
+// 	// *** Class Test ***//
 	int cusNum = 100;
 	Custom cus_0(cusNum);
 

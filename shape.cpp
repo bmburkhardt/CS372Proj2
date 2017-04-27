@@ -8,7 +8,7 @@ using std::shared_ptr;
 using std::make_unique;
 
 
-
+// Circle
 Circle::Circle(double radius) {
 	height = radius * 2;
 	width = radius * 2;
@@ -37,9 +37,7 @@ std::string Circle::generatePostScript()
 }
 
 
-//Given a number of sides and a length, create a shape with that number of sides
-//with given length
-
+// Polygon
 Polygon::Polygon(int numSides, double sideLength)
 {
 	sideLength_g = sideLength;
@@ -98,7 +96,7 @@ std::string Polygon::generatePostScript()
 	return polyString;
 }
 
-
+// Rectangle
 Rectangle::Rectangle(double w, double h) {
 	height = h;
 	width = w;
@@ -157,7 +155,7 @@ std::string Rectangle::generatePostScript()
 	return rectangleString;
 }
 
-
+// Spacer
 Spacer::Spacer(double w, double h) {
 	width = w;
 	height = h;
@@ -189,15 +187,13 @@ std::string Spacer::generatePostScript()
 	return SpacerString;
 }
 
-
+// Square
 Square::Square(double sideLength) : Polygon(4, sideLength) {}
 
-//Create a 3 sided polygon with the given side length
-
+// Triangle
 Triangle::Triangle(double sideLength) : Polygon(3, sideLength) {}
 
-
-
+// Custom
 Custom::Custom(double sideLength)
 {
 	width = sideLength;
@@ -303,6 +299,7 @@ std::string Custom::generatePostScript()
 	return totalString;
 }
 
+// Scaled
 Scaled::Scaled(Shape &shape, double fx, double fy) {
 	std::string s = shape.generatePostScript();
 	ScaleString = std::to_string(fx) + " " + std::to_string(fy) + " scale\n";
@@ -317,6 +314,7 @@ std::string Scaled::generatePostScript()  {
 
 }
 
+// Rotated
 Rotated::Rotated(Shape &shape, int rotationAngle)
 	:refShape(shape), rotAngle(rotationAngle) {
 
@@ -341,180 +339,88 @@ std::string Rotated::generatePostScript()
 	return RotateString;
 }
 
+// CompoundShape
+CompoundShape::CompoundShape(std::vector<shared_ptr<Shape>> shapeVec) {
+	shapeVec_ = shapeVec;
+}
 
+std::string CompoundShape::generatePostScript() {
+	std::string compoundShapeString = "";
 
+	for (unsigned int i = 0; i < shapeVec_.size(); ++i) {
+		compoundShapeString += forward_Translator(shapeVec_[i]);
+		compoundShapeString += (*shapeVec_[i]).generatePostScript();
+		compoundShapeString += reverse_Translator(shapeVec_[i]);
+	}
+	return compoundShapeString;
+}
 
+std::string CompoundShape::forward_Translator(shared_ptr<Shape> shape) const {
+	return "";
+}
+std::string CompoundShape::reverse_Translator(shared_ptr<Shape> shape) const {
+	return "";
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// class ComplexShape : public Shape
-// {
-// public:
-// 	~ComplexShape() = default;
-// 	ComplexShape() = default;
-// 	ComplexShape(std::vector<shared_ptr<Shape>> shapeVec);
-// 	string generatePostScript() const ;
-// private:
-
-// };
-
-
-
-
-Layered::Layered(std::vector<shared_ptr<Shape>> shapeListGiven)
+// Layered
+Layered::Layered(std::vector<shared_ptr<Shape>> shapeVec) : CompoundShape(shapeVec)
 {
-	shapeList = std::move(shapeListGiven);
 	width = 0;
 	height = 0;
 
-	for (unsigned int i = 0; i<shapeList.size(); ++i)
+	for (unsigned int i = 0; i<shapeVec.size(); ++i) 
 	{
-		if (width < shapeList[i]->width)
+		if (width < shapeVec[i]->width)
 		{
-			width = shapeList[i]->width;
+			width = shapeVec[i]->width;
 		}
-		if (height < shapeList[i]->height)
+		if (height < shapeVec[i]->height)
 		{
-			height = shapeList[i]->height;
+			height = shapeVec[i]->height;
 		}
 	}
 }
-std::string Layered::generatePostScript()
-{
-	std::string totalString = "";
-	for (unsigned int i = 0; i<shapeList.size(); ++i)
-	{
-		totalString += shapeList[i]->generatePostScript();
-	}
-	return totalString;
-}
 
-// Vertical shape class
-// Creates a stack of shapes. Shapes are centered based on the widest shape.
-//		Shapes do not overlap.
-
-// Ctor from vector of shapes.
-// Ctor accepts a vector of any size containing pointers to created shapes.
-Vertical::Vertical(std::vector<shared_ptr<Shape>> vertVec)
-{
-	vertStack = std::move(vertVec);
+// Vertical
+Vertical::Vertical(std::vector<shared_ptr<Shape>> shapeVec) : CompoundShape(shapeVec) {
 	height = 0;
 	width = 0;
 	// Find the total height and max width of the vertical shape.
-	for (unsigned int i = 0; i<vertStack.size(); ++i) {
-		height += std::move((vertStack[i]->height) + 1);
+	for (unsigned int i = 0; i < shapeVec.size(); ++i) {
+		height += (shapeVec[i]->height) + 1;
 		// Find max width
-		if (vertStack[i]->width > width) {
-			width = vertStack[i]->width;
+		if (shapeVec[i]->width > width) {
+			width = shapeVec[i]->width;
 		}
 	}
 }
 
-std::string Vertical::generatePostScript()  {
-	std::string vertString = "";
-
-	// Vertical postscript generation loop.
-	for (unsigned int i = 0; i<vertStack.size(); ++i) {
-		vertString += std::to_string(width);
-		vertString += " ";
-		vertString += std::to_string(vertStack[i]->height / 2);
-		vertString += " translate\n";
-		vertString += vertStack[i]->generatePostScript();
-		vertString += std::to_string(-width);
-		vertString += " ";
-		vertString += std::to_string((vertStack[i]->height / 2) + 1);
-		vertString += " translate\n";
-		vertString += "\n";
-	}
-	return vertString;
+std::string Vertical::forward_Translator(shared_ptr<Shape> shape) const {
+	return std::to_string(width) + " " + std::to_string(shape->height / 2) + " translate\n"; 
 }
 
+std::string Vertical::reverse_Translator(shared_ptr<Shape> shape) const {
+	return std::to_string(-width) + " " + std::to_string((shape->height / 2) + 1) + " translate\n";
+}
 
-// Horizontal shape class
-// Creates a row of shapes. Shapes are centered based on the tallest shape.
-//		Shapes do not overlap.
-
-// Ctor from vector of shapes.
-// Ctor accepts a vector of any size containing pointers to created shapes.
-Horizontal::Horizontal(std::vector<shared_ptr<Shape>> horizontalVec)
-{
-	horizontalStack = std::move(horizontalVec);
+// Horizontal
+Horizontal::Horizontal(std::vector<shared_ptr<Shape>> shapeVec) : CompoundShape(shapeVec) {
 	height = 0;
 	width = 0;
-	// Find max height and total width of horizontal shape.
-	for (unsigned int i = 0; i<horizontalStack.size(); ++i) {
-		width += std::move((horizontalStack[i]->width) + 1);
+	// Find the total width and max height of the vertical shape.
+	for (unsigned int i = 0; i < shapeVec.size(); ++i) {
+		width += (shapeVec[i]->width) + 1;
 		// Find max height
-		if (horizontalStack[i]->height > height) {
-			height = horizontalStack[i]->height;
+		if (shapeVec[i]->height > height) {
+			height = shapeVec[i]->height;
 		}
 	}
 }
 
-std::string Horizontal::generatePostScript()  {
-
-	std::string horizontalString = "";
-
-	// Horizontal postscript generation loop.
-	for (unsigned int i = 0; i<horizontalStack.size(); ++i) {
-		horizontalString += std::to_string(horizontalStack[i]->width / 2);
-		horizontalString += " ";
-		horizontalString += std::to_string(height);
-		horizontalString += " translate\n";
-		horizontalString += horizontalStack[i]->generatePostScript();
-		horizontalString += std::to_string((horizontalStack[i]->width / 2) + 1);
-		horizontalString += " ";
-		horizontalString += std::to_string(-height);
-		horizontalString += " translate\n";
-		horizontalString += "\n";
-	}
-	return horizontalString;
+std::string Horizontal::forward_Translator(shared_ptr<Shape> shape) const {
+	return std::to_string(shape->width / 2) + " " + std::to_string(height) + " translate\n"; 
 }
 
+std::string Horizontal::reverse_Translator(shared_ptr<Shape> shape) const {
+	return std::to_string((shape->width / 2) +1) + " " + std::to_string(-height) + " translate\n";
+}
