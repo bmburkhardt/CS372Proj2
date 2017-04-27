@@ -4,7 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <memory>
-using std::unique_ptr;
+using std::shared_ptr;
 using std::make_unique;
 
 
@@ -303,18 +303,112 @@ std::string Custom::generatePostScript()
 	return totalString;
 }
 
+Scaled::Scaled(Shape &shape, double fx, double fy) {
+	std::string s = shape.generatePostScript();
+	ScaleString = std::to_string(fx) + " " + std::to_string(fy) + " scale\n";
+	ScaleString += s;
+	ScaleString += std::to_string(1 / fx) + " " + std::to_string(1 / fy) + " scale\n";
+
+	height = shape.height * fy;
+	width = shape.width * fx;
+}
+std::string Scaled::generatePostScript()  {
+	return ScaleString;
+
+}
+
+Rotated::Rotated(Shape &shape, int rotationAngle)
+	:refShape(shape), rotAngle(rotationAngle) {
+
+	if (rotationAngle == 90 || rotationAngle == 270)
+	{
+		height = shape.width;
+		width = shape.height;
+	}
+	else
+	{
+		height = shape.height;
+		width = shape.width;
+	}
+}
+
+std::string Rotated::generatePostScript() 
+{
+	std::string RotateString = std::to_string(rotAngle);
+	RotateString += " rotate\n";
+	RotateString += refShape.generatePostScript();
+
+	return RotateString;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // class ComplexShape : public Shape
 // {
 // public:
 // 	~ComplexShape() = default;
 // 	ComplexShape() = default;
-// 	ComplexShape(std::vector<unique_ptr<Shape>> shapeVec);
+// 	ComplexShape(std::vector<shared_ptr<Shape>> shapeVec);
 // 	string generatePostScript() const ;
 // private:
 
 // };
 
-Layered::Layered(std::vector<unique_ptr<Shape>> shapeListGiven)
+
+
+
+Layered::Layered(std::vector<shared_ptr<Shape>> shapeListGiven)
 {
 	shapeList = std::move(shapeListGiven);
 	width = 0;
@@ -342,57 +436,13 @@ std::string Layered::generatePostScript()
 	return totalString;
 }
 
-
-
-
-Scaled::Scaled(Shape &shape, double fx, double fy) {
-	std::string s = shape.generatePostScript();
-	ScaleString = std::to_string(fx) + " " + std::to_string(fy) + " scale\n";
-	ScaleString += s;
-	ScaleString += std::to_string(1 / fx) + " " + std::to_string(1 / fy) + " scale\n";
-
-	height = shape.height * fy;
-	width = shape.width * fx;
-}
-std::string Scaled::generatePostScript()  {
-	return ScaleString;
-
-}
-
-
-
-Rotated::Rotated(Shape &shape, int rotationAngle)
-	:refShape(shape), rotAngle(rotationAngle) {
-
-	if (rotationAngle == 90 || rotationAngle == 270)
-	{
-		height = shape.width;
-		width = shape.height;
-	}
-	else
-	{
-		height = shape.height;
-		width = shape.width;
-	}
-}
-
-std::string Rotated::generatePostScript() 
-{
-	std::string RotateString = std::to_string(rotAngle);
-	RotateString += " rotate\n";
-	RotateString += refShape.generatePostScript();
-
-	return RotateString;
-}
-
-
 // Vertical shape class
 // Creates a stack of shapes. Shapes are centered based on the widest shape.
 //		Shapes do not overlap.
 
 // Ctor from vector of shapes.
 // Ctor accepts a vector of any size containing pointers to created shapes.
-Vertical::Vertical(std::vector<unique_ptr<Shape>> vertVec)
+Vertical::Vertical(std::vector<shared_ptr<Shape>> vertVec)
 {
 	vertStack = std::move(vertVec);
 	height = 0;
@@ -433,7 +483,7 @@ std::string Vertical::generatePostScript()  {
 
 // Ctor from vector of shapes.
 // Ctor accepts a vector of any size containing pointers to created shapes.
-Horizontal::Horizontal(std::vector<unique_ptr<Shape>> horizontalVec)
+Horizontal::Horizontal(std::vector<shared_ptr<Shape>> horizontalVec)
 {
 	horizontalStack = std::move(horizontalVec);
 	height = 0;

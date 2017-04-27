@@ -5,7 +5,7 @@
 #include <cmath>
 #include <vector>
 #include <memory>
-using std::unique_ptr;
+using std::shared_ptr;
 using std::make_unique;
 
 class Shape {
@@ -75,7 +75,7 @@ public:
 // public:
 // 	~ComplexShape() = default;
 // 	ComplexShape() = default;
-// 	ComplexShape(std::vector<unique_ptr<Shape>> shapeVec);
+// 	ComplexShape(std::vector<shared_ptr<Shape>> shapeVec);
 // 	string generatePostScript() const override;
 // private:
 
@@ -84,11 +84,11 @@ public:
 class Layered : public Shape
 {
 public:
-	Layered(std::vector<unique_ptr<Shape>> shapeListGiven);
+	Layered(std::vector<shared_ptr<Shape>> shapeListGiven);
 	std::string generatePostScript();
 
 private:
-	std::vector<unique_ptr<Shape>> shapeList;
+	std::vector<shared_ptr<Shape>> shapeList;
 };
 
 class Scaled : public Shape
@@ -113,19 +113,19 @@ private:
 
 class Vertical : public Shape {
 public:
-	Vertical(std::vector<unique_ptr<Shape>> vertVec);
+	Vertical(std::vector<shared_ptr<Shape>> vertVec);
 	std::string generatePostScript() override;
 private:
-	std::vector<unique_ptr<Shape>> vertStack;
+	std::vector<shared_ptr<Shape>> vertStack;
 };
 
 class Horizontal : public Shape {
 public:
-	Horizontal(std::vector<unique_ptr<Shape>> horizontalVec);
+	Horizontal(std::vector<shared_ptr<Shape>> horizontalVec);
 	std::string generatePostScript() override;
 
 private:
-	std::vector<unique_ptr<Shape>> horizontalStack;
+	std::vector<shared_ptr<Shape>> horizontalStack;
 };
 
 #endif // SHAPE_HPP_INCLUDED

@@ -124,17 +124,17 @@ int main() {
 	Rectangle rect2(10, 2000);//largest height
 	Rectangle rect3(1000, 10);//largest width
 
-	std::vector<unique_ptr<Shape>> shapeVec1; //empty example
+	std::vector<shared_ptr<Shape>> shapeVec1; //empty example
 	Layered lay1(std::move(shapeVec1));
 
-	std::vector<unique_ptr<Shape>> shapeVec2;
+	std::vector<shared_ptr<Shape>> shapeVec2;
 	shapeVec2.push_back(make_unique<Circle>(circ));
 	shapeVec2.push_back(make_unique<Circle>(circ2));
 	shapeVec2.push_back(make_unique<Square>(squ));
 	shapeVec2.push_back(make_unique<Polygon>(p_0));
 	Layered lay2(std::move(shapeVec2));
 
-	std::vector<unique_ptr<Shape>> shapeVec3;
+	std::vector<shared_ptr<Shape>> shapeVec3;
 	shapeVec3.push_back(make_unique<Rectangle>(rect2));
 	shapeVec3.push_back(make_unique<Square>(squ));
 	shapeVec3.push_back(make_unique<Rectangle>(rect));
@@ -179,7 +179,7 @@ int main() {
 	// **** Horizontal test for 0 shapes ****
 	double horTotalHeight0 = 0;
 	double horTotalWidth0 = 0;
-	std::vector<unique_ptr<Shape>> horTest0(0);
+	std::vector<shared_ptr<Shape>> horTest0(0);
 	int horTest0Size = horTest0.size();
 	Horizontal horTest0Shape(std::move(horTest0));
 
@@ -201,7 +201,7 @@ int main() {
 	// **** Horizontal test for 1 shape ****
 	double horTotalHeight1 = circ3.height;
 	double horTotalWidth1 = circ3.width;
-	std::vector<unique_ptr<Shape>> horTest1;
+	std::vector<shared_ptr<Shape>> horTest1;
 	horTest1.push_back(make_unique<Circle>(circ3));
 	int horTest1Size = horTest1.size();
 	Horizontal horTest1Shape(std::move(horTest1));
@@ -225,7 +225,7 @@ int main() {
 	// **** Horizontal test for more than 1 shape ****
 	double horTotalHeight2 = circ3.height;
 	double horTotalWidth2 = circ3.width + squ2.width + tri1.width + sca1.width + squ2.width;
-	std::vector<unique_ptr<Shape>> horTest2;
+	std::vector<shared_ptr<Shape>> horTest2;
 	horTest2.push_back(make_unique<Circle>(circ3));
 	horTest2.push_back(make_unique<Square>(squ2));
 	horTest2.push_back(make_unique<Triangle>(tri1));
@@ -265,7 +265,7 @@ int main() {
 	// **** Vertical test for 0 shapes ****
 	double vertTotalHeight0 = 0;
 	double vertTotalWidth0 = 0;
-	std::vector<unique_ptr<Shape>> vertTest0(0);
+	std::vector<shared_ptr<Shape>> vertTest0(0);
 	int vertTest0Size = vertTest0.size();
 	Vertical vertTest0Shape(std::move(vertTest0));
 
@@ -287,7 +287,7 @@ int main() {
 	// **** Vertical test for 1 shape ****
 	double vertTotalHeight1 = circ3.height;
 	double vertTotalWidth1 = circ3.width;
-	std::vector<unique_ptr<Shape>> vertTest1;
+	std::vector<shared_ptr<Shape>> vertTest1;
 	vertTest1.push_back(make_unique<Circle>(circ3));
 	int vertTest1Size = vertTest1.size();
 	Vertical vertTest1Shape(std::move(vertTest1));
@@ -311,7 +311,7 @@ int main() {
 	// **** Vertical test for more than 1 shape ****
 	double vertTotalHeight2 = circ3.height + space1.height + tri1.height + sca1.height + squ2.height;
 	double vertTotalWidth2 = circ3.width;
-	std::vector<unique_ptr<Shape>> vertTest2;
+	std::vector<shared_ptr<Shape>> vertTest2;
 	vertTest2.push_back(make_unique<Circle>(circ3));
 	vertTest2.push_back(make_unique<Spacer>(space1));
 	vertTest2.push_back(make_unique<Triangle>(tri1));
@@ -366,7 +366,7 @@ int main() {
 
 // Messing around with custom shape.
 // NO TESTS FOR THIS
-	std::vector<unique_ptr<Shape>> vertCustom;
+	std::vector<shared_ptr<Shape>> vertCustom;
 	Polygon body(6, 80);
 	Rectangle neck (30, 25);
 	Custom head(80);
